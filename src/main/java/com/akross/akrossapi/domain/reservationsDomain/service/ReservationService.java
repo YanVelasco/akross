@@ -78,7 +78,7 @@ public class ReservationService {
             List<ReservationEntity> reservations = reservationRepository.findByCheckinBetween(startDate, endDate);
             List<ReservationResponseDTO> responseDTOs = new ArrayList<>();
             for (ReservationEntity entity : reservations) {
-                ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO(entity.getId(), entity.getCheckin(), entity.getCheckout(), entity.getStatus());
+                ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO(entity.getId(), entity.getCheckin(), entity.getCheckout(), entity.getStatus(), entity.getCustomer().getId(), entity.getRoom().getId());
                 responseDTOs.add(reservationResponseDTO);
             }
             return ResponseEntity.ok().body(Collections.singletonList(responseDTOs));
@@ -92,7 +92,16 @@ public class ReservationService {
             List<ReservationEntity> occupiedReservations = reservationRepository.findByStatus("IN_USE");
             List<ReservationResponseDTO> responseDTOs = new ArrayList<>();
             for (ReservationEntity entity : occupiedReservations) {
-                ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO(entity.getId(), entity.getCheckin(), entity.getCheckout(), entity.getStatus());
+                UUID customerId = entity.getCustomer() != null ? entity.getCustomer().getId() : null;
+                UUID roomId = entity.getRoom() != null ? entity.getRoom().getId() : null;
+                ReservationResponseDTO reservationResponseDTO = new ReservationResponseDTO(
+                        entity.getId(),
+                        entity.getCheckin(),
+                        entity.getCheckout(),
+                        entity.getStatus(),
+                        customerId,
+                        roomId
+                );
                 responseDTOs.add(reservationResponseDTO);
             }
             return ResponseEntity.ok().body(Collections.singletonList(responseDTOs));
